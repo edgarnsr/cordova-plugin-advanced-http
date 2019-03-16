@@ -1,11 +1,43 @@
 # Changelog
 
+## 2.0.6
+
+- Fixed #187: setSSLCertMode with "default" throws an error on Android
+- Fixed #115: HTTP connections are not kept alive on iOS (thanks MorpheusDe97)
+
+## 2.0.5
+
+- Fixed #185: need more detailed SSL error message
+
+## 2.0.4
+
+- Fixed #179: sending empty string with utf8 serializer throws an exception
+
+## 2.0.3
+
+- Fixed #172: plugin does not respect user installed CA certs on Android
+
+#### Important information
+We've changed a default behavior on Android. User installed CA certs are respected now.
+If you don't want this for your needs, you can switch back to old behavior by setting SSL cert mode to `legacy`.
+
+## 2.0.2
+
+- Fixed #142: Plugin affected by REDoS Issue of tough-cookie
+- Fixed #157: Arguments are double URL-encoded on "downloadFile" (thanks TheZopo)
+- Fixed #164: Arguments are double URL-encoded on "head" (thanks ath0mas)
+
+## 2.0.1
+
+- Fixed #136: Content-Type header non-overwritable on browser platform
+
 ## 2.0.0
 
 - Feature #103: implement HTTP SSL cert modes
 
 - :warning: **Breaking Change**: Removed AngularJS (v1) integration service
 - :warning: **Breaking Change**: Removed "enableSSLPinning" and "acceptAllCerts", use "setSSLCertMode" instead
+- :warning: **Breaking Change**: Certificates must be placed in "www/certificates" folder
 
 ## 1.11.1
 

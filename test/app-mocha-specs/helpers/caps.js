@@ -1,7 +1,5 @@
 const local = {
   iosDevice: {
-    browserName: '',
-    'appium-version': '1.7.1',
     platformName: 'iOS',
     platformVersion: '10.3',
     deviceName: 'iPhone 6',
@@ -9,8 +7,6 @@ const local = {
     app: undefined // will be set later
   },
   iosEmulator: {
-    browserName: '',
-    'appium-version': '1.7.1',
     platformName: 'iOS',
     platformVersion: '11.0',
     deviceName: 'iPhone Simulator',
@@ -18,12 +14,11 @@ const local = {
     app: undefined // will be set later
   },
   androidEmulator: {
-    browserName: '',
-    'appium-version': '1.7.1',
     platformName: 'Android',
     platformVersion: '5.1',
     deviceName: 'Android Emulator',
     autoWebview: true,
+    fullReset: true,
     app: undefined // will be set later
   }
 };
