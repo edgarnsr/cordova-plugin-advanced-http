@@ -1,5 +1,4 @@
 node_modules/**
-test/app-template/www/certificates/*.cer
 tags
 .zedstate
 npm-debug.log

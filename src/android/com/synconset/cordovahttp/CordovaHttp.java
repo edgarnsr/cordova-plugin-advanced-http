@@ -270,11 +270,11 @@ abstract class CordovaHttp {
 
     protected void handleHttpRequestException(HttpRequestException e) {
       if (e.getCause() instanceof UnknownHostException) {
-          this.respondWithError(0, "The host could not be resolved: " + e.getMessage());
+          this.respondWithError(0, "The host could not be resolved");
       } else if (e.getCause() instanceof SocketTimeoutException) {
-          this.respondWithError(1, "The request timed out: " + e.getMessage());
+          this.respondWithError(1, "The request timed out");
       } else if (e.getCause() instanceof SSLHandshakeException) {
-          this.respondWithError(-2, "SSL handshake failed: " + e.getMessage());
+          this.respondWithError("SSL handshake failed");
       } else {
           this.respondWithError("There was an error with the request: " + e.getMessage());
       }

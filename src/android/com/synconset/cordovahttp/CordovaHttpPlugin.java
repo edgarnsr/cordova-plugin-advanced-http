@@ -8,12 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
-import java.security.KeyStore.TrustedCertificateEntry;
-import java.security.cert.Certificate;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -34,14 +30,6 @@ public class CordovaHttpPlugin extends CordovaPlugin {
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
-
-        try {
-          HttpRequest.clearCerts();
-          this.pinSSLCertsFromCAStore();
-        } catch (Exception e) {
-          e.printStackTrace();
-          System.err.println("There was an error loading system's CA certificates");
-        }
     }
 
     @Override
@@ -101,9 +89,7 @@ public class CordovaHttpPlugin extends CordovaPlugin {
         } else if (action.equals("setSSLCertMode")) {
             String mode = args.getString(0);
 
-            HttpRequest.clearCerts();
-
-            if (mode.equals("legacy")) {
+            if (mode.equals("default")) {
                 HttpRequest.setSSLCertMode(HttpRequest.CERT_MODE_DEFAULT);
                 callbackContext.success();
             } else if (mode.equals("nocheck")) {
@@ -111,20 +97,12 @@ public class CordovaHttpPlugin extends CordovaPlugin {
                 callbackContext.success();
             } else if (mode.equals("pinned")) {
                 try {
-                    this.loadSSLCertsFromBundle();
+                    this.loadSSLCerts();
                     HttpRequest.setSSLCertMode(HttpRequest.CERT_MODE_PINNED);
                     callbackContext.success();
-                } catch (Exception e) {
+                } catch(Exception e) {
                     e.printStackTrace();
                     callbackContext.error("There was an error setting up ssl pinning");
-                }
-            } else if (mode.equals("default")) {
-                try {
-                    this.pinSSLCertsFromCAStore();
-                    callbackContext.success();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    callbackContext.error("There was an error loading system's CA certificates");
                 }
             }
         } else if (action.equals("uploadFile")) {
@@ -156,31 +134,24 @@ public class CordovaHttpPlugin extends CordovaPlugin {
         return true;
     }
 
-    private void pinSSLCertsFromCAStore() throws GeneralSecurityException, IOException {
-      this.loadSSLCertsFromKeyStore("AndroidCAStore");
-      HttpRequest.setSSLCertMode(HttpRequest.CERT_MODE_PINNED);
-    }
-
-    private void loadSSLCertsFromKeyStore(String storeType) throws GeneralSecurityException, IOException {
-      KeyStore ks = KeyStore.getInstance(storeType);
-      ks.load(null);
-      Enumeration<String> aliases = ks.aliases();
-
-      while (aliases.hasMoreElements()) {
-        String alias = aliases.nextElement();
-        TrustedCertificateEntry certEntry = (TrustedCertificateEntry) ks.getEntry(alias, null);
-        Certificate cert = certEntry.getTrustedCertificate();
-        HttpRequest.addCert(cert);
-      }
-    }
-
-    private void loadSSLCertsFromBundle() throws GeneralSecurityException, IOException {
+    private void loadSSLCerts() throws GeneralSecurityException, IOException {
         AssetManager assetManager = cordova.getActivity().getAssets();
-        String[] files = assetManager.list("www/certificates");
+        String[] files = assetManager.list("");
+        int index;
         ArrayList<String> cerFiles = new ArrayList<String>();
-
         for (int i = 0; i < files.length; i++) {
-          int index = files[i].lastIndexOf('.');
+            index = files[i].lastIndexOf('.');
+            if (index != -1) {
+                if (files[i].substring(index).equals(".cer")) {
+                    cerFiles.add(files[i]);
+                }
+            }
+        }
+
+        // scan the www/certificates folder for .cer files as well
+        files = assetManager.list("www/certificates");
+        for (int i = 0; i < files.length; i++) {
+          index = files[i].lastIndexOf('.');
           if (index != -1) {
             if (files[i].substring(index).equals(".cer")) {
               cerFiles.add("www/certificates/" + files[i]);

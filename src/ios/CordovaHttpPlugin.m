@@ -20,12 +20,10 @@
 @implementation CordovaHttpPlugin {
     AFSecurityPolicy *securityPolicy;
     bool redirect;
-    AFHTTPSessionManager *manager;
 }
 
 - (void)pluginInitialize {
     securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeNone];
-    manager = [AFHTTPSessionManager manager];
     redirect = true;
 }
 
@@ -106,9 +104,6 @@
         case -1009:
             // no connection
             return [NSNumber numberWithInt:3];
-        case -1202:
-            // untrusted SSL certificate
-            return [NSNumber numberWithInt:-2];
         default:
             return [NSNumber numberWithInt:-1];
     }
@@ -129,7 +124,7 @@
 - (void)setSSLCertMode:(CDVInvokedUrlCommand*)command {
     NSString *certMode = [command.arguments objectAtIndex:0];
 
-    if ([certMode isEqualToString: @"default"] || [certMode isEqualToString: @"legacy"]) {
+    if ([certMode isEqualToString: @"default"]) {
         securityPolicy = [AFSecurityPolicy policyWithPinningMode:AFSSLPinningModeNone];
         securityPolicy.allowInvalidCertificates = NO;
         securityPolicy.validatesDomainName = YES;
@@ -162,6 +157,7 @@
 }
 
 - (void)post:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.securityPolicy = securityPolicy;
 
     NSString *url = [command.arguments objectAtIndex:0];
@@ -203,6 +199,7 @@
 }
 
 - (void)get:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.securityPolicy = securityPolicy;
 
     NSString *url = [command.arguments objectAtIndex:0];
@@ -244,6 +241,7 @@
 }
 
 - (void)put:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.securityPolicy = securityPolicy;
 
     NSString *url = [command.arguments objectAtIndex:0];
@@ -285,6 +283,7 @@
 }
 
 - (void)patch:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.securityPolicy = securityPolicy;
 
     NSString *url = [command.arguments objectAtIndex:0];
@@ -326,6 +325,7 @@
 }
 
 - (void)delete:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.securityPolicy = securityPolicy;
 
     NSString *url = [command.arguments objectAtIndex:0];
@@ -366,6 +366,7 @@
 }
 
 - (void)head:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.securityPolicy = securityPolicy;
     NSString *url = [command.arguments objectAtIndex:0];
     NSDictionary *parameters = [command.arguments objectAtIndex:1];
@@ -405,6 +406,7 @@
 }
 
 - (void)uploadFile:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.securityPolicy = securityPolicy;
 
     NSString *url = [command.arguments objectAtIndex:0];
@@ -461,6 +463,7 @@
 
 
 - (void)downloadFile:(CDVInvokedUrlCommand*)command {
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     manager.securityPolicy = securityPolicy;
 
     NSString *url = [command.arguments objectAtIndex:0];
